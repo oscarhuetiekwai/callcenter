@@ -1,0 +1,178 @@
+.chatbox {
+	position: fixed;
+	position:expression("absolute");
+	width: 180px;
+        bottom: 0px;
+}
+
+.chatboxlist {
+        font-size:12px;
+        font-family:Arial, Helvetica, sans-serif;
+        bottom: 0px;
+        position: absolute;
+        right: 0px;
+        position: fixed;
+        width: 180px;
+        background-color: #ffffff;
+}
+
+.headertitle:link{
+        text-decoration:none;
+        font-weight: bold;
+        color: #FFFFFF;
+}
+
+.headertitle:visited{
+        text-decoration:none;
+}
+
+.headertitle:hover{
+        color: #FFFF00;
+}
+
+.headertitle:active{
+        text-decoration:none;
+}
+
+.chatwithname:link {
+        text-decoration:none;
+        color:#000000;
+}
+
+.chatwithname:visited {
+        text-decoration:none;
+}
+
+.chatwithname:hover {
+        color: #999999;
+}
+
+.chatwithname:active {
+        text-decoration:underline;
+}
+
+.grouptitle:link {
+        text-decoration:none;
+        color:#bf1313;
+        font-weight: bold;
+}
+
+.grouptitle:visited {
+        text-decoration:none;
+}
+
+.grouptitle:hover {
+        color: #FF8080;
+        font-weight: bold;
+}
+
+.grouptitle:active {
+        text-decoration:none;
+}
+
+.chatlist{
+        border-left:1px solid #cccccc;
+        border-right:1px solid #cccccc;
+        border-bottom:1px solid #eeeeee;
+}
+
+.chatboxhead {
+        font-size:12px;
+        font-family:Arial, Helvetica, sans-serif;
+	background-color: #bf1313;
+	padding: 5px;
+	color: #ffffff;
+        height: 18px;
+
+        border-top:1px solid #cccccc;
+	border-right:1px solid #cccccc;
+	border-left:1px solid #cccccc;
+        border-bottom:1px solid #cccccc;
+}
+
+.chatboxblink {
+	background-color: #000000;
+	border-right:1px solid #176689;
+	border-left:1px solid #176689;
+}
+
+.chatboxcontent {
+	font-family: arial,sans-serif;
+	font-size: 13px;
+	color: #333333;
+	height:200px;
+	width:164px;
+	padding:7px;
+	overflow-y:auto;
+	overflow-x:hidden;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+	border-left:1px solid #cccccc;
+	border-right:1px solid #cccccc;
+	border-bottom:1px solid #eeeeee;
+	background-color: #ffffff;
+	line-height: 1.3em;
+}
+
+.chatboxinput {
+	padding: 5px;
+	background-color: #ffffff;
+	border-left:1px solid #cccccc;
+	border-right:1px solid #cccccc;
+	border-bottom:1px solid #cccccc;
+}
+
+.chatboxtextarea {
+	width: 160px;
+	height: 40px;
+	padding:3px 0pt 3px 3px;
+	border: 1px solid #eeeeee;
+	margin: 1px;
+	overflow:hidden;
+}
+
+.chatboxtextareaselected {
+	border: 2px solid #bf1313;
+	margin:0;
+}
+
+.chatboxmessage {
+	margin-left:1em;
+}
+
+.chatboxinfo {
+	margin-left:-1em;
+	color:#666666;
+
+}
+
+.chatboxmessagefrom {
+	margin-left:-1em;
+	font-weight: bold;
+}
+
+.chatboxmessagecontent {
+}
+
+.chatboxclose {
+	float: right;
+}
+
+.chatboxoptions a {
+	text-decoration: none;
+	color: white;
+	font-weight:bold;
+	font-family:Verdana,Arial,"Bitstream Vera Sans",sans-serif;
+}
+
+.chatboxtitle {
+	float: left;
+}
+
+.chatname {
+        padding-left: 11px;
+}
+
+.chatcheckbox{
+        padding-right: 5px;
+}

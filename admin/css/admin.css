@@ -1,0 +1,25 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+.style1 {font-family: Arial, Helvetica, sans-serif}
+
+div.dimmer
+{
+	visibility:hidden;
+	position:absolute;
+	left:0px;
+	top:0px;
+	font-family:Verdana, Geneva, sans-serif;
+	font-weight:bold;
+	padding:40px;
+	background-image:url(images/honey.png);
+	_background-image:none;
+	_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader
+        (enabled=true, sizingMethod=scale src='honey.png');
+}

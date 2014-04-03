@@ -1,0 +1,647 @@
+<?php
+
+require_once('config.php'); 
+require_once('errhandler.php');
+require_once('classuser.php');
+
+class Users {
+	private $mySQL;
+	private $m_szErrorMessage = '';
+	
+	function __construct() {
+		$this->mySQL = new mysqli(DB_HOST,DB_USER,DB_PASS,DB_DATABASE);
+	}
+	
+	function __destruct() {
+		$this->mySQL->close();
+	}
+	
+	public function getUsersCount() {
+		$nUsersCount = 0;
+		
+		if ( $this->mySQL ) {
+			$query = "SELECT count(*) AS totalcount FROM users WHERE userdbstatus='A'";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			if ( $objRow ) {
+				$nUsersCount = $objRow->totalcount;
+			}
+		}
+		
+		return $nUsersCount;
+	}
+	
+	public function getUsersCountByTenant($nTenantID) {
+		$nUsersCount = 0;
+		
+		if ( $this->mySQL ) {
+			$query = "SELECT count(*) AS totalcount FROM users WHERE userdbstatus='A' AND tenantid=" . $nTenantID;
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			if ( $objRow ) {
+				$nUsersCount = $objRow->totalcount;
+			}
+		}
+		
+		return $nUsersCount;
+	}
+	
+	public function getUsers($pageNo, $nLimit) {
+		$arrUsers = array();
+		
+		if ( $this->mySQL ) {
+			$query = "SELECT userid,u.tenantid AS tenantid, IF(u.tenantid = 0, 'SYSTEM', t.name) AS tenantname, " . 
+				"username, userpass, lastname, firstname, userlevel FROM users u LEFT JOIN tenants t ON t.tenantid " . 
+				"= u.tenantid WHERE u.userdbstatus='A' ORDER BY u.username ASC LIMIT " . ($pageNo * $nLimit) . ", " . $nLimit . ";";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			while ( $objRow ) {
+				$user = new User($objRow->userid, $objRow->tenantid, $objRow->tenantname, $objRow->username,
+								$objRow->userpass, $objRow->userlevel, $objRow->lastname, $objRow->firstname );
+				
+				if ( $user ) array_push( $arrUsers, $user );
+				
+				$objRow = $resultSet->fetch_object();
+			}
+		}
+		
+		return $arrUsers;
+	}
+	
+	public function getUsersByTenant($nTenantID, $pageNo, $nLimit) {
+		$arrUsers = array();
+		
+		if ( $this->mySQL ) {
+			$query = "SELECT userid,u.tenantid AS tenantid, IF(u.tenantid = 0, 'SYSTEM', t.name) AS tenantname, " . 
+				"username, userpass, lastname, firstname, userlevel FROM users u LEFT JOIN tenants t ON t.tenantid " . 
+				"= u.tenantid WHERE u.userdbstatus='A' AND u.tenantid = " . $nTenantID . " ORDER BY u.username ASC LIMIT " .
+				($pageNo * $nLimit) . ", " . $nLimit . ";";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			while ( $objRow ) {
+				$user = new User($objRow->userid, $objRow->tenantid, $objRow->tenantname, $objRow->username,
+								$objRow->userpass, $objRow->userlevel, $objRow->lastname, $objRow->firstname );
+				
+				if ( $user ) array_push( $arrUsers, $user );
+				
+				$objRow = $resultSet->fetch_object();
+			}
+		}
+		
+		return $arrUsers;
+	}
+	
+	public function getUserInfo($userID) {
+		$userInfo = NULL;
+		
+		if ( $this->mySQL ) {
+			$query = "SELECT userid,u.tenantid AS tenantid, IF(u.tenantid = 0, 'SYSTEM', t.name) AS tenantname, " . 
+				"username, supervisor, userpass, lastname, firstname, userlevel, pqueuetimeout, queueroutetype, " .
+				"queueroutevalue FROM users u LEFT JOIN tenants t ON t.tenantid " . 
+				"= u.tenantid WHERE u.userdbstatus='A' AND u.userid = " . $userID . ";";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			if ( $objRow ) {
+				$userInfo = new User($objRow->userid, $objRow->tenantid, $objRow->tenantname, $objRow->username,
+								$objRow->userpass, $objRow->userlevel, $objRow->lastname, $objRow->firstname );
+				
+				$userInfo->setSupervisor( $objRow->supervisor );
+			    $userInfo->setPQueueTimeout( $objRow->pqueuetimeout );
+				$userInfo->setQueueRouteType( $objRow->queueroutetype );
+				$userInfo->setQueueRouteValue( $objRow->queueroutevalue );
+			}
+			
+			// get skills 
+			$query = "SELECT * FROM userskills WHERE userid=" . $userInfo->getUserID();
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			while ( $objRow ) {
+				$userInfo->addSkills( $objRow->skillid, $objRow->score );
+				
+				$objRow = $resultSet->fetch_object();
+			}
+			
+			// get queues
+			$query = "SELECT * FROM usersqueues WHERE userid=" . $userInfo->getUserID();
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			while ( $objRow ) {
+				$userInfo->addQueue( $objRow->tenantqueueid );
+				
+				$objRow = $resultSet->fetch_object();
+			}
+			
+			// get wrapups
+			$query = "SELECT * FROM userwrapups WHERE userid=" . $userInfo->getUserID();
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			while ( $objRow ) {
+				$userInfo->addWrapup( $objRow->wrapupid );
+				
+				$objRow = $resultSet->fetch_object();
+			}
+			
+		}
+		
+		return $userInfo;
+	}
+	
+	public function getAllTenantsOption($selTenantID) {
+		if ( $this->mySQL ) {
+			$query = "SELECT tenantid, name FROM tenants ORDER BY name ASC;";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			if ( $selTenantID == 0 ){
+				echo '<option value="0" SELECTED>SYSTEM</option>';
+			} else {
+				echo '<option value="0">SYSTEM</option>';
+			}
+			
+			while ( $objRow ) {
+				if ( $selTenantID == $objRow->tenantid ) {
+					echo '<option value="' . $objRow->tenantid . '" SELECTED>' . $objRow->name . '</option>';
+				} else  {
+					echo '<option value="' . $objRow->tenantid . '" >' . $objRow->name . '</option>';
+				}
+				$objRow = $resultSet->fetch_object();
+			}
+		}
+	}
+	
+	public function getAllUsersLevelsOption($tenantID, $userLevel) {
+		
+		if ( $userLevel == 0 ) {
+			echo '<option value="0" SELECTED>Disabled</option>'; 
+		} else {
+			echo '<option value="0">Disabled</option>'; 
+		}
+		
+		if ( $userLevel == 1 ) {
+			echo '<option value="1" SELECTED>Guest</option>'; 
+		} else {
+			echo '<option value="1">Guest</option>'; 
+		}
+
+		if ( $userLevel == 2 ) {
+			echo '<option value="2" SELECTED>Agent</option>'; 
+		} else {
+			echo '<option value="2">Agent</option>'; 
+		}
+		
+		if ( $userLevel == 3 ) {
+			echo '<option value="3" SELECTED>Supervisor</option>'; 
+		} else {
+			echo '<option value="3">Supervisor</option>'; 
+		}
+		
+		if  ( $tenantID == "0" ) {
+			if ( $userLevel == 4 ) {
+				echo '<option value="4" SELECTED>Administrator</option>'; 
+			} else {
+				echo '<option value="4">Administrator</option>'; 
+			}
+		}
+	}
+	
+	public function saveUser($user) {
+		$bReturn = false;
+		
+		if ( $user ) {
+			if ( $user->getUsername() == '' ) {
+				$this->m_szErrorMessage = 'Please enter username!!!';
+				return $bReturn;
+			} else if ( $user->getUserpass() == '' ) {
+				$this->m_szErrorMessage = 'Please enter password!!!';
+				return $bReturn;
+			}
+		} else {
+			$this->m_szErrorMessage = 'Uninitialize user class!!!';
+			return $bReturn;
+		}
+		
+		if ( !$this->mySQL ) {
+			$this->m_szErrorMessage = 'Error connecting to the database!!!';
+			return $bReturn;
+		}
+		
+		if ( $user->getUserID() > 0 ) {
+			// this is for update
+			if ( $this->getUsername( $user->getUserID() ) != $user->getUsername() ) {
+				if ( $this->isUsernameExist( $user->getUsername() ) ) {
+					$this->m_szErrorMessage = 'Username "' . $user->getUsername() . '" is already in the database. Please change the username!!!';
+					return $bReturn;
+				}
+			}
+			
+			$query = "UPDATE users SET tenantid=" . $user->getTenantID() . ", username='" . $user->getUsername() . 
+				"', userpass='" . $user->getUserpass() . "', lastname='" . $user->getLastname() . "', firstname='" .
+				$user->getFirstname() . "', userlevel=" . $user->getUserLevel() . ", supervisor=" . $user->getSupervisor() .
+				", pqueuetimeout=" . $user->getPQueueTimeout() . ", queueroutetype=" . $user->getQueueRouteType() .
+				", queueroutevalue='" . $user->getQueueRouteValue() . "' " . 
+				" WHERE userid=" .	$user->getUserID();
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$query = "SELECT userid FROM users WHERE username='" . $user->getUsername() . "' AND userdbstatus='A'";
+			$resultSet = $this->mySQL->query($query);
+			$objRow = $resultSet->fetch_object();
+			
+			if ( $objRow ) {
+				$user->setUserID( $objRow->userid );
+			}
+			
+			$bReturn = true;
+			
+
+		} else {
+			// this is for adding new items
+			if ( $this->isUsernameExist( $user->getUsername() ) ) {
+				$this->m_szErrorMessage = 'Username "' . $user->getUsername() . '" is already in the database. Please change the username!!!';
+				return $bReturn;
+			}
+			
+			$query = "INSERT INTO users (tenantid, supervisor, username, userpass, lastname, firstname, userlevel, pqueuetimeout, queueroutetype, " .
+				"queueroutevalue) VALUES (" . $user->getTenantID() . ", " . $user->getSupervisor() . ", '" . $user->getUsername() . "', '" . 
+				$user->getUserpass() . "', '" . $user->getLastname() . "', '" . $user->getFirstname() . "', " . $user->getUserLevel() . ", " .
+				$user->getPQueueTimeout() . ", " . $user->getQueueRouteType() . ", '" . $user->getQueueRouteValue() . "');";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$query = "SELECT userid FROM users WHERE username='" . $user->getUsername() . "' AND userdbstatus='A'";
+			$resultSet = $this->mySQL->query($query);
+			$objRow = $resultSet->fetch_object();
+			
+			if ( $objRow ) {
+				$user->setUserID( $objRow->userid );
+			}
+			
+			$bReturn = true;
+		}
+		
+		// saving skills
+		if ( $user->getUserID() > 0 ) {
+			$query = "DELETE FROM userskills WHERE userid=" . $user->getUserID();
+			$this->mySQL->query($query);
+			
+			$arraySkills = $user->getSkills();
+			foreach( $arraySkills as $skillSet ) {
+				$arrSkillSet = explode(":", $skillSet);
+				$query = "INSERT INTO userskills( userid, skillid, score) VALUES (" .
+					$user->getUserID() . ", " . $arrSkillSet[0] . ", " . $arrSkillSet[1] . ")"; 
+				
+				$this->mySQL->query($query);
+			}
+		}
+		
+		// saving queues
+		if ( $user->getUserID() > 0 ) {
+			$query = "DELETE FROM usersqueues WHERE userid=" . $user->getUserID(); 
+			$this->mySQL->query($query);
+			
+			foreach( $user->getQueues() as $queue ) {
+				$query = "INSERT INTO usersqueues ( userid, tenantqueueid ) VALUES ( " . 
+					$user->getUserID() . ", " . $queue . ")";
+				
+				$this->mySQL->query($query);
+			}
+		}
+		
+		// saving wrapups
+		if ( $user->getUserID() > 0 ) {
+			$query = "DELETE FROM userwrapups WHERE userid=" . $user->getUserID();
+			$this->mySQL->query( $query );
+			
+			foreach( $user->getWrapups() as $wrapup ) {
+				$query = "INSERT INTO userwrapups( userid, wrapupid ) VALUES ( " .
+					$user->getUserID() . ", " . $wrapup . ")";
+				
+				$this->mySQL->query( $query );
+			}
+		}
+		
+		return $bReturn;
+	}
+
+        public function deleteUser($userID) {
+                if ( $this->mySQL ) {
+                        $query = "UPDATE users SET userdbstatus = 'D' WHERE userid=" . $userID . ";";
+                        $resultSet = $this->mySQL->query( $query );
+
+                        return $resultSet;
+                }
+        }
+	
+	public function getLastErrorMessage() { return $this->m_szErrorMessage; }
+	
+	private function getUsername($userID) {
+		$szReturn = '';
+		
+		if ( $this->mySQL ) {
+			$query = "SELECT username FROM users WHERE userid=" . $userID . " AND userdbstatus='A';";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			if ( $objRow ) {
+				$szReturn = $objRow->username;
+			}
+		}
+		
+		return $szReturn;
+	}
+	
+	private function isUsernameExist($userName) {
+		$bReturn = false;
+		
+		if ( $this->mySQL ) {
+			$query = "SELECT * FROM users WHERE username='" . $userName . "' AND userdbstatus='A';";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			if ( $objRow ) {
+				$bReturn = true;
+			}
+		}
+		
+		return $bReturn;
+	}
+	
+	public function displayUserList($nTenantID, $nFilter) {
+		$szReturn = '';
+		
+		if ( $this->mySQL ) {
+			$query = "SELECT userid, username, userlevel, t.name AS tenantname FROM users u LEFT JOIN tenants t ON t.tenantid=u.tenantid WHERE u.userdbstatus='A' AND u.tenantid=" .
+				$nTenantID;
+			
+			if ( $nFilter != 0 ) {
+				$query = $query . " AND userlevel=" . $nFilter;
+			}
+			
+			if($_SESSION['WEB_ADMIN_USERLEVEL'] != 4){
+				$query = $query . " AND userlevel != 4";
+			}
+
+			
+			$query = $query . " ORDER BY username ASC";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			$nCnt = 1;
+			
+			while ( $objRow ) {
+//				echo '<li><label for="chkuser' . $nCnt . '"><input type="checkbox" id="chkuser"' . $nCnt . 
+//					'" name="chkuser' . $nCnt . '" value="' . $objRow->userid . '" />' . $objRow->username . 
+//					'</label></li>';
+				$szUserLevel = 'Disabled';
+				
+				switch ($objRow->userlevel) {
+					case 2:
+						$szUserLevel = 'Agent';
+						break;
+					case 3:
+						$szUserLevel = 'Supervisor';
+						break;
+					case 4:
+						$szUserLevel = 'Administrator';
+						break;
+                    case 5:
+						$szUserLevel = 'Team Leader';
+						break;
+				}
+				
+				//$szReturn = $szReturn . '<label onclick="displayUserInfo(' . $objRow->userid . ');" for="chkuser' . 
+				//	$nCnt . '"><input type="checkbox" id="chkuser"' . $nCnt . 
+				//	'" name="chkuser' . $nCnt . '" value="' . $objRow->userid . '" /><b><font color="#009999">' . $objRow->username . 
+				//	'</font></b><br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tenant: ' . $objRow->tenantname . '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Level: ' .
+				//	$szUserLevel . '</label>';		
+				//if ( $nTenantID == "0" ) {
+				//	$szReturn = $szReturn . '<label onclick="displayUserInfo(' . $objRow->userid . ');" for="chkuser' . 
+				//		$nCnt . '"><input type="checkbox" id="chkuser"' . $nCnt . 
+				//		'" name="chkuser' . $nCnt . '" value="' . $objRow->userid . '" /><b><font color="#009999">' . $objRow->username . 
+				//		'</font></b><br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tenant: ' . $objRow->tenantname . '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Level: ' .
+				//		$szUserLevel . '</label>';						
+				//} else {
+					
+
+					$szReturn = $szReturn . '<label onclick="displayUserInfo(' . $objRow->userid . ');" for="chkuser' . 
+						$nCnt . '"><input type="checkbox" id="chkuser"' . $nCnt . 
+						'" name="chkuser" value="' . $objRow->userid . '" /><b><font color="#009999">' . $objRow->username . 
+						'</font></b>&nbsp;&nbsp;' .	$szUserLevel . '</label>';						
+				//}
+				
+				$objRow = $resultSet->fetch_object();
+                                $nCnt++;
+			}
+		}
+		
+		return $szReturn;
+	}
+	
+	public function getSkillsList($nTenantID) {
+		$szReturn = '<table border="0" cellpadding="0" cellspacing="0">';
+	
+		if ( $this->mySQL ) {
+			$query = "SELECT skillid, skill FROM skills WHERE skilldbstatus='A' AND tenantid=" .
+				$nTenantID . " ORDER BY skill ASC";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			$nCnt = 1;
+			
+			while ( $objRow ) {
+				$szChkName = 'chkskill' . $nCnt;
+				$szSkillName = 'txtskill' . $nCnt;
+				$szRow = '<tr>';
+				$szRow .= '<td width="30px"><input id="' . $szChkName . '" name="' . $szChkName . '" type="checkbox" value="' . $objRow->skillid . 
+					'" onclick="onSkillsCheckboxClick(\'' . $szChkName . '\', \'' . $szSkillName . '\');" ></td>';
+				$szRow .= '<td width="140px">' . $objRow->skill . '</td>';
+				$szRow .= '<td><input id="' . $szSkillName . '" name="' . $szSkillName . '" type="text" value="0"  height="13" width="40" style="width: 40px;height:20px;text-align:right;display:none;" onblur="validateSkillScore(\'' . $szSkillName . '\');"/></td>';
+				$szRow .= '</tr>';
+				
+				$szReturn .= $szRow;
+				$objRow = $resultSet->fetch_object();
+				$nCnt++;
+			}
+		}
+		
+		$szReturn .= '</table>';
+		
+		return $szReturn;
+	}
+	
+	
+	public function getQueuesList($nTenantID) {
+		$szReturn = '<table border="0" cellpadding="0" cellspacing="0">';
+	
+		if ( $this->mySQL ) {
+			$query = "SELECT tenantqueueid, queuename FROM tenantqueues WHERE queuedbstatus = 'A' and tenantid=" .
+				$nTenantID . " ORDER BY queuename ASC";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			$nCnt = 1;
+			
+			while ( $objRow ) {
+				$szChkName = 'chkqueue' . $nCnt;
+				$szRow = '<tr>';
+				$szRow .= '<td width="30px"><input id="' . $szChkName . '" name="' . $szChkName . '" type="checkbox" value="' . $objRow->tenantqueueid . 
+					'"></td>';
+				$szRow .= '<td width="200px">' . $objRow->queuename . '</td>';
+				$szRow .= '</tr>';
+				
+				$szReturn .= $szRow;
+				$objRow = $resultSet->fetch_object();
+				$nCnt++;
+			}
+		}
+		
+		$szReturn .= '</table>';
+		
+		return $szReturn;
+	}
+	
+	public function getRouteQueuesList($nTenantID) {
+		$szReturn = '';
+	
+		if ( $this->mySQL ) {
+			$query = "SELECT tenantqueueid, queuename FROM tenantqueues WHERE queuedbstatus = 'A' and tenantid=" .
+				$nTenantID . " ORDER BY queuename ASC";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			while ( $objRow ) {
+				$szReturn .= ( '<option value="' . $objRow->tenantqueueid . '">' . $objRow->queuename . '</option>' );
+				$objRow = $resultSet->fetch_object();
+			}
+		}
+		
+		return $szReturn;
+	}
+	
+	public function getRouteAgentList($nTenantID) {
+		$szReturn = '';
+	
+		if ( $this->mySQL ) {
+			$query = "SELECT userid, username FROM users u LEFT JOIN tenants t ON t.tenantid=u.tenantid WHERE u.tenantid=" .
+				$nTenantID . "  AND userlevel=2 ORDER BY username ASC";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			while ( $objRow ) {
+				$szReturn .= ( '<option value="' . $objRow->userid . '">' . $objRow->username . '</option>' );
+				$objRow = $resultSet->fetch_object();
+			}
+		}
+		
+		return $szReturn;
+	}
+	
+	public function getRouteExtList($nTenantID) {
+		$szReturn = '';
+	
+		if ( $this->mySQL ) {
+			$query = "SELECT name FROM sipaccounts WHERE  tenantid=" . $nTenantID . " ORDER BY name ASC";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			while ( $objRow ) {
+				$szReturn .= ( '<option value="' . $objRow->name . '">' . $objRow->name . '</option>' );
+				$objRow = $resultSet->fetch_object();
+			}
+		}
+		
+		return $szReturn;
+	}
+	
+	public function getWrapupsList($nTenantID) {
+		$szReturn = '<table border="0" cellpadding="0" cellspacing="0">';
+	
+		if ( $this->mySQL ) {
+			$query = "SELECT wrapupid, wrapup FROM wrapups WHERE wrapupdbstatus='A' AND tenantid=" .
+				$nTenantID . " ORDER BY wrapup ASC";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			$nCnt = 1;
+			
+			while ( $objRow ) {
+				$szChkName = 'chkwrapup' . $nCnt;
+				$szRow = '<tr>';
+				$szRow .= '<td width="30px"><input id="' . $szChkName . '" name="' . $szChkName . '" type="checkbox" value="' . $objRow->wrapupid . 
+					'"></td>';
+				$szRow .= '<td width="200px">' . $objRow->wrapup . '</td>';
+				$szRow .= '</tr>';
+				
+				$szReturn .= $szRow;
+				$objRow = $resultSet->fetch_object();
+				$nCnt++;
+			}
+		}
+		
+		$szReturn .= '</table>';
+		
+		return $szReturn;
+	}
+	
+	public function getSupervisorList($nTenantID) {
+		$szReturn = '';
+		if ( $this->mySQL ) {
+			$query = "SELECT userid, username FROM users WHERE tenantid=" .
+				$nTenantID . " AND userlevel=3 ORDER BY username ASC";
+			
+			$resultSet = $this->mySQL->query($query);
+			
+			$objRow = $resultSet->fetch_object();
+			
+			$szReturn = '<select id="selSupervisor" name="selUserLevel" width="180" style="width:180px">';
+			while ( $objRow ) {
+				$szReturn .= '<option value="' . $objRow->userid . '">' . $objRow->username . '</option>';
+				$objRow = $resultSet->fetch_object();
+			}
+			$szReturn .= '</select>';
+		}
+		
+		return $szReturn;
+	}
+	
+}
+
+
+?>

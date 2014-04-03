@@ -1,0 +1,98 @@
+<script language="JavaScript">
+	$(document).ready(function()
+	{
+		//disable the button
+		$("#btn_report_date").attr("disabled", true);
+		
+		$("#report_date").focus(function(){
+			($(this).val() != "") ? $("#btn_report_date").attr("disabled", false) : $("#btn_report_date").attr("disabled", true);
+		});
+		
+		//date picker
+		$("#report_date").datepick({
+			                       onSelect: function() {($("#report_date").val() != "") ? $("#btn_report_date").attr("disabled", false) : $("#btn_report_date").attr("disabled", true);},
+			                       showTrigger: '<img onchange="return setFocus(\'report_date\');" onclick="return generateEnabled(\'btn_report_date\');" border="0" src="images/be_calendar.gif" class="trigger" id="calImg" style="padding-left:10px;">'});	
+	    
+		
+	}
+	);
+	
+	function generateReportDate(id)
+	{
+		// Now, load the report
+		reportDate = $("#" + id).val();
+		dtReportYear = reportDate.substring(6);
+		dtReportMonth = reportDate.substring(0, 2);
+		dtReportDay = reportDate.substring(3, 5);
+		startdate = dtReportYear + "-" + dtReportMonth + "-" + dtReportDay;
+		nTenantID = 1;
+		$('.btn_generate').openDOMWindow({ 
+									height:310, 
+									width:screenWidthDiv(wt), 
+									positionType:'absolute', 
+									positionTop:268, 
+									//eventType:'click', 
+									positionLeft:285, 
+									windowSource:'iframe', 
+									windowSourceURL: baseURI + '/birt-viewer/frameset?__report=queue_summary_hourly.rptdesign&startdate=' + startdate,
+									windowPadding:0, 
+									loader:1,
+									borderSize:0, 
+									loaderImagePath:'images/preloader.png', 
+									loaderHeight:screenHeightDiv(ht), 
+									loaderWidth:screenWidthDiv(wt), 
+									overlayOpacity:0, 
+									overlay:0
+									}
+									);
+		//unload report
+		$("#" + id + ", .virtualqueuereport").closeDOMWindow({eventType:'click'});
+		//unload report
+		$("#report_date").closeDOMWindow({eventType:'focus'});
+		
+		//disable the button
+		$("#btn_report_date").attr("disabled", true);
+	}
+	
+	function generateEnabled(id)
+	{
+		//disable the button
+		$("#" + id).attr("disabled", false);
+	}
+	
+	//focus on the report date text field
+	function setFocus(id)
+	{
+		//unload report
+		$("#" + id).focus();
+		
+	}
+	
+</script>
+<div class="formtitle"><!--Queue Interval Report-->Queue Hourly Report</div>
+				    <div>&nbsp;</div>
+					<div>&nbsp;</div>
+				    <!-- Virtual Queue Report -->
+					<div id="virtualqueuereport">
+						<!-- column 1 -->
+					    <div class="col1">
+							<div class="formfields">
+								<div class="formlabelalign">Report Date:</div>
+								     <input type="text" name="report_date" id="report_date" class="formtext" onclick="return generateEnabled('btn_report_date');" readonly />
+						             
+							</div>
+							<br />
+							<br />
+					    </div>
+						<!-- end of column 1 -->
+						<!-- column 2 -->
+						<div class="col2">
+							<div class="formfields">
+								<div class="formlabelalign">&nbsp;</div>
+								     <button name="btn_report_date" id="btn_report_date" class="btn_generate" onclick="return generateReportDate('report_date');">Generate</button>
+						    </div>
+						</div>
+						<!-- end of column 2 -->
+					</div>
+					<!-- end of Virtual Queue Report -->
+    	     </div>

@@ -1,0 +1,41 @@
+<?php
+    session_start();
+	require_once('config.php'); 
+	require_once('errhandler.php');
+	require_once('classunavailcode.php');
+	require_once('classunavailcodes.php');
+	
+	
+	if ( isset($_SESSION['WEB_ADMIN_SESSION']) ) {
+		if ( isset($_GET['adminunavail']) ) {
+			if ( $_GET['adminunavail'] == 'unavailsave' ) {
+				$unavail = new UnavailCode($_GET['userstatusid'], $_GET['tenantid'], $_GET['userstatus'], $_GET['productive']);
+				$unavails = new UnavailCodes();
+				
+				if ( $unavails->saveUnavail( $unavail ) ) {
+					echo 'adminunavail:unavailsave:1:'; 
+				} else {
+					echo 'adminunavail:unavailsave:0:' . $skills->getLastErrorMessage(); 
+				}
+			} else if ( $_GET['adminunavail'] == 'unavaillist' ) {
+				$unavails = new UnavailCodes();
+				$unavaillist = $unavails->displayUnavailableCodes( $_GET['tenantid'], $_GET['filter'] );
+				
+				$unavaillist = str_replace(":", "<dquote />", $unavaillist);
+				$unavaillist = str_replace("|", "<dpipe />", $unavaillist);
+				echo 'adminunavail:unavaillist:' . $unavaillist;
+			} else if ( $_GET['adminunavail'] == 'unavailinfo' ) {
+				$unavails = new UnavailCodes();
+				$unavail = $unavails->getUnavailInfo( $_GET['userstatusid'] );
+				
+				$unavailInfo = $unavail->getUserStatusID() . '|' . $unavail->getTenantID() . '|' . $unavail->getUserStatus() . 
+					'|'. $unavail->getProductive();
+					
+				$unavailInfo = str_replace(":", "<dquote />", $unavailInfo);
+				$unavailInfo = str_replace("|", "<dpipe />", $unavailInfo);
+				
+				echo 'adminunavail:unavailinfo:' . $unavailInfo;
+			}
+		}
+	}
+?>

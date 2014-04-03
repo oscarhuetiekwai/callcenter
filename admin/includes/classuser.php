@@ -1,0 +1,119 @@
+<?php
+
+require_once('errhandler.php');
+
+class User {
+	private $m_nUserID = 0;
+	private $m_nTenantID = 0;
+	private $m_szTenantName = '';
+	private $m_szUsername = '';
+	private $m_szUserpass = '';
+	private $m_nUserLevel = 0;
+	private $m_szLastname = '';
+	private $m_szFirstname = '';
+	private $m_nSupervisor = 0;
+	private $m_arrSkills = array();
+	private $m_arrQueues = array();
+	private $m_arrWrapups = array();
+	private $m_nPQueueTimeout = 0;
+	private $m_nQueueRouteType = 1;
+	private $m_szQueueRouteValue = '';
+	
+	
+	function __construct($nUserID,$nTenantID,$szTenantName,$szUsername,$szUserpass,$nUserLevel,$szLastname,$szFirstname) {
+		$this->m_nUserID = $nUserID;
+		$this->m_nTenantID = $nTenantID;
+		$this->m_szUsername = $szUsername;
+		$this->m_szUserpass = $szUserpass;
+		$this->m_nUserLevel = $nUserLevel;
+		$this->m_szLastname = $szLastname;
+		$this->m_szFirstname = $szFirstname;
+		$this->m_szTenantName = $szTenantName;
+	}
+	
+	function __destruct() {
+	}
+	
+	public function getUserID() { return $this->m_nUserID; }
+	public function setUserID($nUserID) { $this->m_nUserID = $nUserID; }
+	
+	public function getTenantID() { return $this->m_nTenantID; }
+	public function setTenantID($nTenantID) { $this->m_nTenantID = $nTenantID; }
+	
+	public function getTenantName() { return $this->m_szTenantName; }
+	public function setTenantName($szTenantName) { $this->m_szTenantName = szTenantName; }
+	
+	public function getUsername() { return $this->m_szUsername; }
+	public function setUsername($szUsername) { return $this->m_szUsername; }
+	
+	public function getUserpass() { return $this->m_szUserpass; }
+	public function setUserpass($szUserpass) { $this->m_szUserpass = $szUserpass; }
+	
+	public function getUserLevel() { return $this->m_nUserLevel; }
+	public function setUserLevel($nUserLevel) { $this->m_nUserLevel = $nUserLevel; }
+	
+	public function getLastname() { return $this->m_szLastname; }
+	public function setLastname($szLastname) { $this->m_szLastname = $szLastname; }
+	
+	public function getFirstname() { return $this->m_szFirstname; }
+	public function setFirstname($szFirstname) { $this->m_szFirstname = $szFirstname; }
+	
+	public function getSupervisor() { return $this->m_nSupervisor; }
+	public function setSupervisor($nSupervisor) { $this->m_nSupervisor = $nSupervisor; }
+	
+	public function getPQueueTimeout() { return $this->m_nPQueueTimeout; }
+	public function setPQueueTimeout($nPQueueTimeout) { $this->m_nPQueueTimeout = $nPQueueTimeout; }
+	
+	public function getQueueRouteType() { return $this->m_nQueueRouteType; }
+	public function setQueueRouteType($nQueueRouteType) { $this->m_nQueueRouteType = $nQueueRouteType; }
+	
+	public function getQueueRouteValue() { return $this->m_szQueueRouteValue; }
+	public function setQueueRouteValue($szQueueRouteValue) { $this->m_szQueueRouteValue = $szQueueRouteValue; }
+	
+	public function getSkills() { return $this->m_arrSkills; }
+	public function addSkills($skillID, $skillScore) {
+		array_push( $this->m_arrSkills, $skillID . ":" . $skillScore );
+	}
+	
+	public function getQueues() { return $this->m_arrQueues; }
+	public function addQueue($queueid) {
+		array_push( $this->m_arrQueues, $queueid );
+	}
+	
+	public function getWrapups() { return $this->m_arrWrapups; }
+	public function addWrapup($wrapupid) {
+		array_push( $this->m_arrWrapups, $wrapupid );
+	}
+	
+	public function getUserLevelDesc() {
+		$szDesc = '';
+		
+		switch ( $this->m_nUserLevel ) {
+			case 0: /* disabled */
+				$szDesc = 'Disabled';
+				break;
+			case 1: /* guest */
+				$szDesc = 'Guest';
+				break;
+			case 2: /* Agent */
+				$szDesc = 'Agent';
+				break;
+			case 3: /* Supervisor */
+				$szDesc = 'Supervisor';
+				break;
+			case 4: /* Administrator */
+				$szDesc = 'Administrator';
+				break;
+                        case 5: /* Team Leader */
+				$szDesc = 'Team Leader';
+				break;
+			default:
+				$szDesc = 'Disabled';
+				break;
+		}
+		
+		return $szDesc;
+	}
+}
+
+?>

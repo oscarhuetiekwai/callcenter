@@ -1,0 +1,205 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	line-height: 17px;
+	font-weight: normal;
+	text-decoration: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+a:link {
+	color:#FFF;
+	text-decoration:none;
+}
+
+a:visited {
+	color:#FFF;
+	text-decoration:none;
+}
+
+a:hover {
+	/*color:#FF0;*/
+}
+
+a.morelink:link {
+	font-size:14px;
+	color: #009999;
+	text-decoration: none;
+}
+
+a.morelink:hover {
+	font-size:14px;
+	color: #009999;
+	text-decoration: none;
+}
+
+a.morelink:visited {
+	font-size:14px;
+	color: #009999;
+	text-decoration: none;	
+}
+
+td.tableTitle {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:16px;
+	font-weight:bold;
+	
+}
+
+td.tableHeader {
+	background-color:#d9e4d6;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:14px;
+	font-weight:bold;
+	text-align:center;
+}
+
+td.tableFooter {
+	background-color:#d9e4d6;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+}
+
+td.tableRow {
+	background-color:#c2dad2;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:normal;
+	text-align:left;
+}
+
+td.tableLink {
+	background-color:#c2dad2;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+	text-align:center;	
+}
+
+a.tableLink:link {
+	color:#00C;
+	text-decoration:underline;
+}
+
+a.tableLink:visited {
+	color:#00C;
+	text-decoration:underline;
+}
+
+a.tableLink:hover {
+	color:#000;
+	text-decoration:underline;	
+}
+
+a.reportLink:link {
+	color:#000;
+	text-decoration:none;
+}
+
+a.reportLink:visited {
+	color:#000;
+	text-decoration:none;
+}
+
+a.reportLink:hover {
+	color:#F00;
+	text-decoration:none;
+}
+
+a.reportLink:active {
+	color:#F00;
+	text-decoration:none;
+}
+
+h1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 22px;
+	line-height: 27px;
+	font-weight: normal;
+	color: #009966;
+	text-decoration: none;
+	margin-bottom: 5px;
+}
+h2 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	font-weight: normal;
+	line-height: 24px;
+}
+
+select.listCheckBox, ul { height: 100px; overflow: auto; width: 100px; border: 1px solid #000; }
+ul { list-style-type: none; margin: 0; padding: 0; overflow-x: hidden; }
+li { margin: 0; padding: 0; }
+
+
+.labelline label { display: block; color: WindowText; background-color: Window; margin: 0; padding: 0; width: 100%; }
+.labelline label:hover { background-color: Highlight; color: HighlightText; }
+
+input.txtRightAlign {
+	text-align:right;
+}
+
+div.divskills{
+	overflow:auto;
+	width:250px;
+	height:145px;
+	border:1px solid #336699;
+	padding-left:5px;
+}
+
+div.divqueues{
+	overflow:auto;
+	width:250px;
+	height:145px;
+	border:1px solid #336699;
+	padding-left:5px;	
+}
+
+table.tblcallstats {
+	background-color:#e2e9db;
+	text-align:center;
+	font-size:11px;
+}
+
+table.tbluserstats {
+	background-color:#e2e9db;
+	text-align:center;
+	font-size:11px;
+}
+
+
+input.date {
+	width: 150px;
+	color: #000;
+}
+
+table.tblstats {
+	
+	border:thick;
+	border-color:#900;
+}
+
+.spannav A:link {text-decoration: underline; color:blue;}
+.spannav A:visited {text-decoration: underline; color:blue;}
+.spannav A:active {text-decoration: underline; color:blue;}
+.spannav A:hover {text-decoration: underline; color: red;}
+
+div.divreportscontainer
+{
+	float:right;
+}
+
+.divchangepwd label, .divchangepwd input { display:block; }
+.divchangepwd input.text { margin-bottom:12px; width:95%; padding: .4em; }
+.divchangepwd fieldset { padding:0; border:0; margin-top:25px; }
+.divchangepwd h1 { font-size: 1.2em; margin: .6em 0; }
+.divchangepwd div#users-contain { width: 350px; margin: 20px 0; }
+.divchangepwd div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
+.divchangepwd div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
+.divchangepwd .ui-dialog .ui-state-error { padding: .3em; }
+.divchangepwd .validateTips { border: 1px solid transparent; padding: 0.3em; }

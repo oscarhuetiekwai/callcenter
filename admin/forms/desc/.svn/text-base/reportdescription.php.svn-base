@@ -1,0 +1,150 @@
+<div id="agentloginlogoutreportdesc">
+	<div class="formtitle">Description</div>
+	<div>&nbsp;</div>
+		Agent Login / Logout Report that displays:
+		<ul class="indentdesc">
+		    <li>Agent name.
+			<li>Login.
+			<li>Logout.
+			<li>duration.
+		</ul>
+		<div class="note">Note: Valid date range: 1 day.</div>
+	
+</div>
+<div id="extensionsummaryreportdesc">
+	<div class="formtitle">Description</div>
+	<div>&nbsp;</div>
+		Extension / Agent Summary Report that displays:
+		<ul class="indentdesc">
+		    <li>Extension no / Agent name.
+			<li>Queue name that the agent logs on.
+			<li>Calls received.
+			<li>Calls answered.
+			<li>Calls abandoned.
+			<li>Calls missed.
+			<li>Average talk time per agent.
+		</ul>
+		<div class="note">Note: Valid date range: 7 days.</div>
+</div>
+<div id="queuesummaryreportdesc">
+	<div class="formtitle">Description</div>
+	<div>&nbsp;</div>
+		Queue Summary Report that displays:
+		<ul class="indentdesc">
+		    <li>Queue name.
+			<li>Calls received.
+			<li>Calls answered.
+			<li>Calls abandoned.
+			<li>Calls timed out.
+			<li>Average talk time per queue.
+		</ul>
+		<div class="note">Note: Valid date range: 7 days.</div>
+</div>
+<div id="queuehourlyreportdesc">
+	<div class="formtitle">Description</div>
+	<div>&nbsp;</div>
+		<!--Queue Interval Report that displays:-->
+		Queue Hourly Report that displays:
+		<ul class="indentdesc">
+		    <li>Queue name.
+			<li>Calls received.
+			<li>Calls answered.
+			<li>Calls abandoned.
+			<li>Calls timed out.
+			<li>Average talk time per queue.
+		</ul>
+		<div class="note">Note: Valid date range: 1 day.</div>
+</div>
+<div id="agentproductivityreportdesc">
+	<div class="formtitle">Description</div>
+	<div>&nbsp;</div>
+		<!--Queue Interval Report that displays:-->
+		Agent Productivity Report that displays:
+		<ul class="indentdesc">
+			<li>Date.
+		    <li>Agent ID.
+			<li>Agent Name.
+			<li>Total Calls Receieved.
+			<li>Total Calls Answered.
+			<li>Talk Time.
+			<li>After Call Work.
+			<li>Hold Time.
+			<li>Handling Time.
+			<li>Productive Time.
+			<li>Unproductive Time.
+			<li>Available Time.
+			<li>Login Duration.
+			<li>Occupancy Time.
+			<li>Occupancy Rate.
+		</ul>
+		<div class="note">Note: Valid date range: 7 days.</div>
+</div>
+<div id="agentstatusoccupancyreportdesc">
+	<div class="formtitle">Description</div>
+	<div>&nbsp;</div>
+		<!--Queue Interval Report that displays:-->
+		Agent Status and Occupancy Report that displays:
+		<ul class="indentdesc">
+			<li>Date.
+		    <li>Agent ID.
+			<li>Agent Name.
+		    <li>Occupancy Rate.
+			<li>Status.
+			<li>Productive Time.
+			<li>Total Productive Time.
+			<li>Unproductive Time.
+			<li>Total Unproductive Time.
+			<li>Occupancy Rate (Percentage).
+		</ul>
+		<div class="note">Note: Valid date range: 7 days.</div>
+</div>
+<div id="dnisreportdesc">
+	<div class="formtitle">Description</div>
+	<div>&nbsp;</div>
+		<!--Queue Interval Report that displays:-->
+		DNIS Report that displays:
+		<ul class="indentdesc">
+			<li>Date.
+		    <li>DNIS Number.
+			<li>DNIS Name.
+			<li>Total Calls Receieved.
+			<li>Total Calls Answered (IVR).
+			<li>Calls Answered (Queue).
+			<li>Calls Abandon (IVR).
+			<li>Calls Abandon (Queue).
+			<li>Calls Orphaned.
+			<li>Calls Answered Percentage (< = SLA).
+			<li>Calls Answered Percentage (> SLA).
+			<li>Calls Abandon Percentage (IVR).
+			<li>Calls Abandon Percentage (Queue).
+			<li>Calls Orphaned (Percentage).
+			<li>IVR Time.
+			<li>Queue Time.
+			<li>Talk Time.
+		</ul>
+		<div class="note">Note: Valid date range: 7 days.</div>
+</div>
+<div id="queuereportdesc">
+	<div class="formtitle">Description</div>
+	<div>&nbsp;</div>
+		<!--Queue Interval Report that displays:-->
+		Queue Report that displays:
+		<ul class="indentdesc">
+			<li>Date.
+		    <li>DNIS Number.
+			<li>DNIS Name.
+			<li>Total Calls Receieved.
+			<li>Total Calls Answered (IVR).
+			<li>Calls Answered (Queue).
+			<li>Calls Abandon (Queue).
+			<li>Calls Orphaned.
+			<li>Calls Answered Percentage (< = SLA).
+			<li>Calls Answered Percentage (> SLA).
+			<li>Calls Abandon Percentage (Queue).
+			<li>Calls Orphaned (Percentage).
+			<li>Queue Time.
+			<li>Talk Time.
+		</ul>
+		<div class="note">Note: Valid date range: 7 days.</div>
+</div>
+

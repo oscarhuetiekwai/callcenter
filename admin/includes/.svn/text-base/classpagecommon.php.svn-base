@@ -1,0 +1,226 @@
+<?php
+
+class PageCommon {
+	private $m_nUserLevel = 0;
+	
+	function __construct() {
+	}
+	
+	function __destruct() {
+	}
+	
+	public function displayHeader($firstName,$exten,$userLevel,$tenant) {
+		$szUserLevel = 'Administrator';
+		if ($userLevel == 3 ) {
+			$szUserLevel = $tenant . ' Supervisor';
+		}
+		
+		$this->m_nUserLevel = $userLevel;
+		echo '<table width="100%" height="78" border="0" cellspacing="0" cellpadding="0">';
+		echo '<tr>';
+    	echo '<td width="30" height="78" align="left">&nbsp;</td>';
+    	echo '<td width="160" align="left"><img src="images/login.gif" alt="" width="296" height="26" /></td>';
+    	echo '<td width="461" height="78">&nbsp;</td>';
+    	echo '<td width="220" height="78" align="center"><table width="220" border="0" cellspacing="3" cellpadding="0">';
+      	echo '<tr>';
+        echo '<td width="48" height="38"><img src="images/user_pic.gif" width="42" height="38" /></td>';
+        echo '<td width="163" valign="top"><font face="Arial, Helvetica, sans-serif">' . $szUserLevel . '<font size="2"><br />';
+        echo 'Welcome, ' . $firstName . '<br />';
+        echo 'Extension No. ' . $exten . '</font></font></td>';
+      	echo '</tr>';
+    	echo '</table></td>';
+  		echo '</tr>';
+		echo '</table>'; 
+	}
+	
+	/*
+		Views
+		 DNIS
+		 Virtual Queues
+		 Agents
+		 Summary
+		
+		Quality Monitoring
+		 Play Call Logs
+		
+		Administration
+		 Users
+			Agent
+			   Should be tied to supervisor
+			Supervisor
+			   Should be tied to which queues
+		 Extensions
+		   Supervisor
+			  Display active and non-active
+		 Skills
+		 Queues
+		 IVR
+		 Trunk Groups
+ */
+	public function displayNavigation($topMenu, $subMenu) {
+		echo '<table width="100%" height="66" border="0" cellspacing="0" cellpadding="0">';
+		echo '<tr>';
+    	echo '<td width="49" height="38" align="center" background="images/tile_blackbar.gif"><img src="images/spacer.gif" width="1" height="38" /></td>';
+		
+		if ( $topMenu == 'view' ) {
+    		echo '<td width="96" height="38" align="center" bgcolor="#a11313"><b>';
+			echo '<font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif">Views</font></b></td>';			
+		} else {
+    		echo '<td width="96" height="38" align="center" background="images/tile_blackbar.gif"><b>';
+			echo '<font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="admin.php">Views</a></font></b></td>';
+		}
+		
+		if ( $topMenu == 'qmonitor' ) {
+			echo '<td width="160" height="38" align="center" bgcolor="#a11313"><b>';
+			echo '<font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif">Quality Monitoring</font></b></td>';
+		} else  {
+			echo '<td width="160" height="38" align="center" background="images/tile_blackbar.gif"><b>';
+			echo '<font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminqmonitor.php">Quality Monitoring</a></font></b></td>';
+		}
+		
+		if ( $topMenu == 'admin' ) {
+			echo '<td width="120" align="center" bgcolor="#a11313"><b>';
+			echo '<font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif">Administrations</font></b></td>';
+		} else {
+	    	echo '<td width="120" align="center" background="images/tile_blackbar.gif"><b>';
+			echo '<font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminusers.php">Administrations</a></font></b></td>';
+		}
+		
+		if ( $topMenu == 'reports' ) {
+    		echo '<td width="82" align="center"  bgcolor="#a11313"><b>';
+			echo '<font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif">Reports</font></b></td>';
+		} else {
+    		echo '<td width="82" align="center" background="images/tile_blackbar.gif"><b>';
+			echo '<font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="reports.php">Reports</a></font></b></td>';			
+		}
+
+    	echo '<td width="566" height="39" background="images/tile_blackbar.gif" align="right"><a href="login.php"><img src="images/btnlogout.png" /></a>&nbsp;&nbsp;</td>';
+  		echo '</tr>';
+		echo '<tr>';
+		echo '<td height="27" colspan="1" bgcolor="#a11313">&nbsp;</td>';
+    	echo '<td height="27" colspan="6" bgcolor="#a11313">';
+    	echo '<table width="100%" border="0" cellspacing="0" cellpadding="0">';
+      	echo '<tr>';
+		
+		if ( $topMenu == 'view' ) {
+			/*if ( $subMenu == 'dnis' ) 
+				echo '<td align="center"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">DNIS</font></b></td>';
+			else 
+				echo '<td align="center"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="admin.php">DNIS</a></font></b></td>';
+				
+			if ( $subMenu == 'vqueues' ) 
+				echo '<td align="center"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Virtual Queues</font></b></td>';
+			else
+	        	echo '<td align="center"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminvqueues.php">Virtual Queues</a></font></b></td>';
+				
+    	    echo '<td align="center"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif">Agents</font></b></td>';
+        	echo '<td align="center"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif">Summary</font></b></td>'; */
+			
+			if ( $subMenu == 'queues' )
+				echo '<td align="left" style="width:100px;"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Queues</font></b></td>';
+			else 
+				echo '<td align="left" style="width:100px;"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="admin.php">Queues</a></font></b></td>';
+				
+			if ( $subMenu == 'agents' ) 
+				echo '<td align="left" style="width:100px;"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Agents</font></b></td>';
+			else 
+				echo '<td align="left" style="width:100px;"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminagents.php">Agents</a></font></b></td>';
+				
+			echo '<td align="left" style="width:100px;">&nbsp;</td>';
+			echo '<td align="left" style="width:100px;">&nbsp;</td>';
+			echo '<td align="left" style="width:100px;">&nbsp;</td>';
+			echo '<td align="left" style="width:100px;">&nbsp;</td>';
+				
+		} else if ($topMenu == 'qmonitor' ) {
+			echo '<td align="center"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif">Call Logs</font></b></td>';
+		} else if ($topMenu == 'admin' ) {
+			if ( $subMenu == 'users' ) {
+				echo '<td align="center" width="120px"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Users</font></b></td>';
+			} else {
+				echo '<td align="center" width="120px"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminusers.php">Users</a></font></b></td>';
+			}
+			
+			if ( $this->m_nUserLevel > 3 ) {
+				if ( $subMenu == 'extensions' ) {
+					echo '<td align="center" width="120px"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Extensions</font></b></td>';
+				} else {
+					echo '<td align="center" width="120px"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminextension.php">Extensions</a></font></b></td>';
+				}
+			
+			}
+			
+			
+			if ( $subMenu == 'skills' ) {
+        		echo '<td align="center" width="120px"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Skills</font></b></td>';
+			} else {
+				echo '<td align="center" width="120px"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminskills1.php">Skills</a></font></b></td>';
+			}
+			
+			if ( $subMenu == 'unavailcodes' ) {
+				echo '<td align="center" width="120px"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Unavailable Codes</font></b></td>';
+			} else {
+				echo '<td align="center" width="120px"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminunavail.php">Unavailable Codes</a></font></b></td>';
+			}
+			
+			if ( $subMenu == 'wrapups' ) {
+        		echo '<td align="center" width="120px"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Wrap-ups</font></b></td>';
+			} else {
+				echo '<td align="center" width="120px"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminwrapups.php">Wrap-ups</a></font></b></td>';
+			}
+			
+			
+			if ( $subMenu == 'queues' ) {
+				echo '<td align="center" width="120px"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Queues</font></b></td>';
+			} else {
+				echo '<td align="center" width="120px"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminqueues.php">Queues</a></font></b></td>';
+			}
+			
+			if ( $subMenu == 'outbounds' ) {
+				echo '<td align="center" width="120px"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Outbounds</font></b></td>';
+			} else {
+				echo '<td align="center" width="120px"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminoutbounds.php">Outbounds</a></font></b></td>';
+			}
+
+			if ( $this->m_nUserLevel > 3 ) {
+				if ( $subMenu == 'tenants' ) {
+					echo '<td align="center" width="120px"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Tenants</font></b></td>';
+				} else {
+					echo '<td align="center" width="120px"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="admintenant.php">Tenants</a></font></b></td>';
+				}
+			}
+			
+			if ( $subMenu == 'settings' ) {
+				echo '<td align="center" width="120px"><b><font color="#FFFF00" size="2" face="Arial, Helvetica, sans-serif">Settings</font></b></td>';
+			} else {
+				echo '<td align="center" width="120px"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="adminsettings.php">Settings</a></font></b></td>';
+			}
+
+			//echo '<td align="center" width="120px"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><a href="admintrunks.php">Trunk</a></font></b></td>';
+			echo '<td>&nbsp;</td>';
+		} else if ($topMenu == 'reports' ) {
+			echo '<td align="center"><b><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif">&nbsp;</font></b></td>';
+		}
+		
+      	echo '</tr>';
+    	echo '</table></td>';
+  		echo '</tr>';
+		echo '</table>';
+ 	}
+	
+	public function displayMenu($tenantID) {
+		echo '<p align="center">';
+		echo '<a href="admin.php">Home</a>&nbsp;|&nbsp;';
+		
+		if ( $tenantID == "0" ) {
+			echo '<a href="tenant.php">Tenants</a>&nbsp;|&nbsp;';
+			echo '<a href="extension.php">Extensions</a>&nbsp;|&nbsp;';
+		}
+		
+		echo '<a href="user.php">Users</a>&nbsp;|&nbsp;';
+		echo '<a href="skill.php">Skills</a>&nbsp;|&nbsp;';
+		echo '<a href="queue.php">Queues</a>';		
+		echo '</p>';
+	}
+}
+
+?>

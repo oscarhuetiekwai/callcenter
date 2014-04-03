@@ -1,0 +1,330 @@
+<?php
+    session_start();
+	require_once('includes/config.php'); 
+	require_once('includes/errhandler.php');
+	require_once('includes/classpagecommon.php');
+	require_once('includes/classagentutil.php');
+	
+	if ( !isset($_SESSION['WEB_AGENT_SESSION']) ) {
+		header('location:login.php');
+	}
+	
+	$pageCommon = new PageCommon();
+	$agentUtil = new AgentUtil();
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Accordia Solution - Agent</title>
+<link rel="stylesheet" type="text/css" href="css/common.css" />
+<link rel="stylesheet" type="text/css" href="css/chat/chat.css" />
+<script language="javascript" type="text/javascript" src="javascript/chat/chatCIS.js"></script>
+<script language="javascript" type="text/javascript" src="javascript/prototype.js"></script>
+<script language="javascript" type="text/javascript" src="javascript/effects.js"></script>
+<script language="javascript" type="text/javascript" src="javascript/common.js"></script>
+<script language="javascript" type="text/javascript" src="javascript/keepalive.js"></script>
+<script language="javascript" type="text/javascript">	
+
+	function onUserStatusChange() {
+		var seluserstatus = document.getElementById("seluserstatus");
+		
+		if ( seluserstatus ) {
+			addHttpRequest("statuschange", "code=" + seluserstatus.value);
+		}
+	}
+	
+	function onTransfer() {
+		var divtransfercontrol = document.getElementById("divtransfercontrol");
+		
+		if ( divtransfercontrol ) {
+			if ( document.getElementById("selonlineagents").value != "" ) {
+				addHttpRequest("getagentstatus", "username=" + document.getElementById("selonlineagents").value);
+			}
+			if ( divtransfercontrol.style.display == "none" ) {
+				var effectTransferControl = new Effect.toggle('divtransfercontrol', 'appear');
+			}
+		}
+	}
+	
+	function onselonlineagentsChange() {
+		if ( document.getElementById("selonlineagents").value != "" ) {
+			addHttpRequest("getagentstatus", "username=" + document.getElementById("selonlineagents").value);
+		}
+	}
+	
+	function onTransferAgent() {
+		if ( document.getElementById("selonlineagents").value != "" ) {
+			addHttpRequest("transfer", "agent=" + document.getElementById("selonlineagents").value);
+		}
+	}
+	
+	function onTransferNumber() {
+		if ( document.getElementById("txttransferext").value != "" ) {
+			addHttpRequest("transfer", "exten=" + document.getElementById("txttransferext").value);
+		}
+	}
+	
+	function onEndCall() {
+		addHttpRequest("endcall","");	
+	}
+	
+	function makeOutCall() {
+		var txtoutcallphone = document.getElementById("txtoutcallphone");
+		
+		if ( txtoutcallphone ) {
+			if ( txtoutcallphone.value != "" ) {
+				outCall(document.getElementById('txtoutcallphone').value);
+				var divoutcall = document.getElementById("divoutcall");
+				
+				if ( divoutcall.style.display != "none" ) {
+					var effectOutCall = new Effect.toggle('divoutcall', 'appear');
+				}
+				
+			} else {
+				alert("Please input the phone number to be called to!!!");
+			}
+		}
+	}
+	
+	function makeOutCallFrame(phone) {
+		outCall( phone );
+		var divoutcall = document.getElementById("divoutcall");
+				
+		if ( divoutcall.style.display != "none" ) {
+			var effectOutCall = new Effect.toggle('divoutcall', 'appear');
+		}
+	}
+	
+	function onHold() {
+		addHttpRequest("hold", "");
+	}
+		
+	function displayFrame(frameName) {
+		var  divframecontacts = document.getElementById("divframecontacts");
+		var  divframeknowledgebase = document.getElementById("divframeknowledgebase");
+		
+		if ( frameName == "divframecontacts" ) {
+			divframecontacts.style.display = "block";
+		} else {
+			divframecontacts.style.display = "none";
+		}
+		
+		if ( frameName == "divframeknowledgebase" ) {
+			divframeknowledgebase.style.display = "block";
+		} else {
+			divframeknowledgebase.style.display = "none";
+		}
+	}
+	
+	function toggleQueue() {
+		var effectDivQueue = new Effect.toggle('divqueue', 'blind');
+	}
+
+        function getFrameHeight() {
+                return ( document.height - 120 ) + "px";
+        }
+
+	function adjustHeight() {
+		//document.getElementById('colCRM').style.height=getFrameHeight();
+                //document.getElementById('frameCRM').height=getFrameHeight();
+	}
+</script>
+</head>
+
+<body onload="assignUserName('<?php echo $_SESSION['WEB_AGENT_USER'] ?>'); startKeepAlive();adjustHeight();return false" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<?php
+	$pageCommon->displayHeader($_SESSION['WEB_AGENT_FNAME'],$_SESSION['WEB_AGENT_EXTEN'],$_SESSION['WEB_AGENT_TENANT']);
+?>
+<table width="100%" height="38" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="278" height="38" align="center" background="images/tile_blackbar.gif">
+    	<font color="#FFFFFF" face="Arial, Helvetica, sans-serif" size="2">Interaction Panel</font>
+    </td>
+    <td width="160" height="38" background="images/tile_blackbar.gif" valign="middle">
+    	<input type="image" src="images/btn_sect_contacts.png" onclick="displayFrame('divframecontacts');"/></td>
+    <td width="160" height="38" background="images/tile_blackbar.gif" valign="middle">
+    	<!-- <input type="image" src="images/btn_sect_knowledgebase.png" onclick="displayFrame('divframeknowledgebase');" /> -->
+    </td>
+    <!--<td width="160" height="38" background="images/tile_blackbar.gif" valign="middle">
+    	<input id="btnqueue" type="image" src="images/btn_sect_queues.png" onclick="toggleQueue();" style="display:none;" />
+    </td>-->
+    <td background="images/tile_blackbar.gif" align="right">
+    	<a href="login.php"><img src="images/btnlogout.png" /></a>&nbsp;&nbsp;</td>
+  </tr>
+</table>
+
+<input type="hidden" id="hdnagenttenantid" value="<?php echo $_SESSION['WEB_AGENT_TENANTID']; ?>" />
+<input type="hidden" id="htnagentusername" value="<?php echo $_SESSION['WEB_AGENT_USER'];?>" />
+<input type="hidden" id="outboundoldstatus" value=""/>
+<table width="100%" height="90%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td  class="tdcallinfo" width="20%" align="center" valign="top" bgcolor="#e2e9db">
+        <div id="divqueueborder" style="width:99%">
+        	<!--<table cellpadding="0" cellspacing="0" width="100%" style="background-color: #a8df7e;-moz-border-radius: 10px;-webkit-border-radius: 5px; padding: 0px; width:100%; margin:0 3%; height:100%; vertical-align:top;">-->
+            <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #a8df7e; padding: 0px; width:100%; margin:0 3%; height:100%; vertical-align:top;">
+            	<tr align="center">
+                	<th width="25%" style="text-align:center;font-family:Arial, Helvetica, sans-serif; font-weight:normal; font-size:11px;">Caller ID</th>
+                    <th width="52%" style="text-align:center;font-family:Arial, Helvetica, sans-serif; font-weight:normal; font-size:11px;">Queue</th>
+                    <th width="23%" style="text-align:center;font-family:Arial, Helvetica, sans-serif; font-weight:normal; font-size:11px;">Duration</th>
+                </tr>
+                <tr>
+                	<td colspan="3">
+                    	<div id="divqueue" style="overflow:auto; height:62px; width:100%; vertical-align:top;">
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+    	<table width="95%">
+        	<tr>
+     			<td width="55">Status </td>
+				<td><?php echo $agentUtil->getUserStatusList($_SESSION['WEB_AGENT_TENANTID']); ?></td>
+            </tr>
+        </table>
+
+        <div id="divoutcall">
+        	<table width="95%" bgcolor="#e6f0f1">
+            	<tr>
+                	<td colspan="3">
+                    	<font size="-2" color="#FF0000"><b>Manual Call</b></font>
+                    </td>
+                </tr><tr>
+                	<td>Phone</td>
+                    <td width="130"><input type="text" id="txtoutcallphone" style="width: 130px;" /></td>
+                    <td>
+                    	<!-- <a onclick="makeOutCall();"><img src="images/btncall.png" /></a> -->
+                        <input type="image" onclick="makeOutCall();" src="images/btncall.png" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div id="divcallcontrol" style="display:none;">
+        	<table width="95%" bgcolor="#e6f0f1" cellspacing="0" cellpadding="0">
+            	<tr>
+                	<td colspan="2"><font size="-2" color="#FF0000"><b>Call Control</b></font></td>
+                </tr>
+            	<tr>
+                	<td align="right">
+                    	<!-- <a onclick="onTransfer();"><img alt="Transfer" src="images/btntransfer.png"/></a> -->
+                        <input type="image" onclick="onTransfer();" src="images/btntransfer.png" />
+                    </td>
+                    <!--<td><a onclick="onHold();"><img alt="Hold" src="images/btnhold.png" /></a></td>-->
+                    <td align="left">
+                    	<input type="image" onclick="onEndCall();" src="images/btnendcall.png" />
+                    	<!--<a onclick="onEndCall();"><img alt="End Call" src="images/btnendcall.png" /></a>-->
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div id="divtransfercontrol" style="display:none;">
+        	<table width="95%" bgcolor="#e6f0f1" cellspacing="0" cellpadding="0">
+            	<tr>
+                	<td>Number</td>
+                    <td><input type="text" id="txttransferext" style="width:130px;" /></td>
+                    <td><input type="image" src="images/btncall.png" onclick="onTransferNumber();"/></td>
+                </tr>
+                <tr>
+                	<td>Agent</td>
+                    <td><div id="divtransferagent"></div></td>
+                    <td><input type="image" src="images/btncall.png" onclick="onTransferAgent();"/></td>
+                </tr>
+            </table>
+        </div>
+        <br/>
+        
+    	<div id="divcallinfo" style="display:none;">
+        	<input type="hidden" id="hdncallid" value="" />
+        	<table width="95%"  style="background-color:#e6f0f1;">
+            	<tr>
+                	<td width="100">Queue Type</td>                  
+                    <td><div id="lblcampaigntype"></div></td>
+                </tr>
+                <tr>
+                	<td>DNIS</td>
+                    <td id="lbldnis"></td>
+                </tr>
+                <tr>
+                	<td>Queue</td>
+                    <td id="lblqueue"></td>
+                </tr>
+                <tr>
+                	<td>Caller No.</td>
+                    <td id="lblcallerno"></td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <div id="divwrapup1" style="background-color:#e6f0f1; text-align:left; width: 95%; display: none;">
+        	<font size="-2" color="#FF0000"><b>Wrapups</b></font><br />
+            <div id="divwrapups" style="overflow:auto; height:100px;">
+            </div>
+        </div>
+  <br /> 
+        <!--<table width="230" border="0" cellspacing="2" cellpadding="0">
+          <tr>
+            <td colspan="2" align="left"><font size="2" face="Arial, Helvetica, sans-serif">Supervisor Chat:</font></td>
+          </tr>
+          <tr>
+            <td colspan="2" align="left"><form id="form11" name="form11" method="post" action="">
+              <label>
+                <textarea name="textarea2" id="textarea2" cols="25" rows="5"></textarea>
+              </label>
+            </form>            </td>
+          </tr>
+          <tr>
+            <td width="122" align="left"><label>
+              <input name="textfield8" type="text" id="textfield8" size="20" />
+            </label></td>
+            <td width="102" align="left"><label>
+              <input type="submit" name="button" id="button" value="Send"/>
+            </label></td>
+          </tr>
+        </table>--></td>
+    <td width="70%" valign="top" bgcolor="#e6f0f1"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+        </tr>
+      <tr>
+      	<td id="colCRM" colspan="2" width="100%">
+        	<div style="width=100%; height:100%; overflow:auto;">
+        	<!-- <div id="divqueue" style="width: 100%; height:60px; display:none;">
+            </div> -->
+        	 <div id="divframecontacts">
+            	<iframe id="frameCRM"  name="frameCRM" 
+                	src="../../callcenter/customers/login.php?acc_user=<?php echo $_SESSION['WEB_AGENT_USER'];?>&acc_pwd=<?php echo $_SESSION['WEB_AGENT_PWD'];?>" width="100%" frameborder="0"></iframe>
+            </div> 
+            <div id="divframeknowledgebase" style="display:none;">
+            	<iframe id="frameknowledgebase"  name="frameknowledgebase" 
+                	src="../../callcenter/kb/index.php" width="100%" height="850px" frameborder="0">
+                    </iframe>
+            </div>
+            </div>
+        </td>
+      </tr>
+      
+    </table></td>
+  </tr>
+</table>
+<!-- <table width="100%" height="20" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td align="center" bgcolor="#000000"><font color="#FFFFFF" size="1" face="Arial, Helvetica, sans-serif">Copyright&copy; 2010 | Accordia Solution</font></td>
+  </tr>
+</table> -->
+<!-- <APPLET NAME="ScreenRecord"
+	CODEBASE="objects/"
+	ARCHIVE="cisscrn.jar"
+	CODE="accordia.screenrecording.ScreenRecording.class"
+	WIDTH=10
+	HEIGHT=10
+	BORDER=0
+	MAYSCRIPT>
+</APPLET> -->
+
+
+<?php $pageCommon->displayChatBoxList($_SESSION['WEB_AGENT_SESSION'],$_SESSION['WEB_AGENT_USER'],$_SESSION['WEB_AGENT_USERID']); ?>
+
+</body>
+</html>
